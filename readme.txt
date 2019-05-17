@@ -1,0 +1,3 @@
+redis中的0号数据库存的用户邮箱激活的token，并根据token键取出对应的user_id
+redis中的1号数据库存的用户登录浏览器的Session缓存，用户的历史浏览记录缓存
+redis中的8号数据库存的发送激活邮箱的Celery任务

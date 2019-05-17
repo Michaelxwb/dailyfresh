@@ -1,5 +1,5 @@
 from django.contrib import admin
-
+from django.core.cache import cache
 from goods.models import *
 
 
@@ -12,6 +12,9 @@ class BaseModelAdmin(admin.ModelAdmin):
         from celery_tasks.tasks import generate_static_index_html
         generate_static_index_html.delay()
 
+        # 清楚缓存
+        cache.delete('index_page_data')
+
     def delete_model(self, request, obj):
         '''删除表中的数据时调用'''
         super().save_model(request, obj)
@@ -19,6 +22,9 @@ class BaseModelAdmin(admin.ModelAdmin):
         # 发出任务 让celery帮我们重新生成静态页面
         from celery_tasks.tasks import generate_static_index_html
         generate_static_index_html.delay()
+
+        # 清楚缓存
+        cache.delete('index_page_data')
 
 
 class GoodsTypeAdmin(BaseModelAdmin):
@@ -37,13 +43,13 @@ class IndexPromotionBannerAdmin(BaseModelAdmin):
     list_display = ['id', 'name', 'url', 'image']
 
 
-class GoodsSKUAdmin(BaseModelAdmin):
+class GoodsSKUAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'desc', 'price', 'create_time', 'unite', 'image']
 
 
 admin.site.register(GoodsType, GoodsTypeAdmin)
 admin.site.register(Goods)
-admin.site.register(GoodsSKU,GoodsSKUAdmin)
+admin.site.register(GoodsSKU, GoodsSKUAdmin)
 admin.site.register(GoodsImage)
 admin.site.register(IndexGoodsBanner, IndexGoodsBannerAdmin)
 admin.site.register(IndexPromotionBanner, IndexPromotionBannerAdmin)
